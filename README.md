@@ -33,7 +33,7 @@ d_f__d_feat_custom = torch.autograd.grad(f_custom, features, grad_out, retain_gr
 d_f__d_grid_custom = torch.autograd.grad(f_custom, grid, grad_out, retain_graph=True, create_graph=True, allow_unused=True)[0]
 
 print((d_f__d_feat_torch - d_f__d_feat_custom).abs().max())
-print((d_f__d_grid_torch - d_f__d_feat_custom).abs().max())
+print((d_f__d_grid_torch - d_f__d_grid_custom).abs().max())
 
 # second order gradients (only supporting 2nd order gradient from d_out/grids as of now)
 grad_d_f__d_grid_custom  = torch.ones_like(d_f__d_grid_custom)
