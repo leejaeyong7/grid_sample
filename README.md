@@ -2,6 +2,8 @@
 Simple CUDA implementation of torch.nn.functional.grid_sample with 2D inputs.
 
 ## Usage
+For comparison against autograd based grid_sampler, @see tests/test_grid.py
+
 ```python
 # copy the grid_encoder folder to appropriate directory
 import torch
