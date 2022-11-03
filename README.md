@@ -47,6 +47,7 @@ d_f__d_grid____d_feat = torch.autograd.grad(d_f__d_grid_custom, features, grad_d
 
 ## Limitations
 - This function only works for 'bilinear' mode with 'aligned corners'
+- Only works for 'CUDA' enabled devices
 - Only computes second order gradients from d_out/grids with respect to:
   - first order gradient: (d_out/ grids) / d_(grad_out)
   - features: (d_out / grids) / d_features
