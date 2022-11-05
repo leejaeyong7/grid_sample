@@ -50,8 +50,8 @@ OH = 100
 OW = 17
 
 features = torch.randn(B, C, IH, IW).cuda()
-grid = torch.randn(B, OH, OW, 2).cuda() * 2 - 1
-grid = grid.clamp(-1, 1)
+grid = torch.rand(B, OH, OW, 2).cuda() * 2 - 1
+# grid = grid.clamp(-1, 1)
 # grid[..., 0] = 1
 # grid[..., 1] = 1 
 
@@ -85,8 +85,8 @@ print('first order')
 print((d_f__d_feat_torch - d_f__d_feat_custom).abs().max())
 print((d_f__d_grid_torch - d_f__d_grid_custom).abs().max())
 # print('first order')
-# print((d_f__d_feat_torch_ - d_f__d_feat_custom).abs().max())
-# print((d_f__d_grid_torch_ - d_f__d_grid_custom).abs().max())
+print((d_f__d_feat_torch_ - d_f__d_feat_custom).abs().max())
+print((d_f__d_grid_torch_ - d_f__d_grid_custom).abs().max())
 # print((d_f__d_feat_torch_ - d_f__d_feat_torch).abs().max())
 # print((d_f__d_grid_torch_ - d_f__d_grid_torch).abs().max())
 
