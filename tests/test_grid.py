@@ -43,14 +43,17 @@ def grid_sample_2d(mat, sample):
 
 # -- setting up test cases
 B = 10
-C = 3
-IH = 100
-IW = 150
-OH = 13
+C = 16
+IH = 150
+IW = 10
+OH = 100
 OW = 17
 
 features = torch.randn(B, C, IH, IW).cuda()
-grid = torch.rand(B, OH, OW, 2).cuda() * 2 - 1
+grid = torch.randn(B, OH, OW, 2).cuda() * 2 - 1
+grid = grid.clamp(-1, 1)
+# grid[..., 0] = 1
+# grid[..., 1] = 1 
 
 features.requires_grad=True
 grid.requires_grad=True
@@ -58,10 +61,12 @@ grid.requires_grad=True
 
 # sampling outputs
 f_torch = grid_sample_2d(features, grid)
+_f_torch = torch.nn.functional.grid_sample(features, grid, mode='bilinear', align_corners=True)
 f_custom = grid_sample(features, grid)
 
 # print the differences
 print((f_torch - f_custom).abs().max())
+print((_f_torch - f_custom).abs().max())
 
 grad_out = torch.randn_like(f_torch)
 grad_out.requires_grad = True
@@ -69,13 +74,21 @@ grad_out.requires_grad = True
 # first order gradients
 d_f__d_feat_torch = torch.autograd.grad(f_torch, features, grad_out, retain_graph=True, create_graph=True, allow_unused=True)[0]
 d_f__d_grid_torch = torch.autograd.grad(f_torch, grid, grad_out, retain_graph=True, create_graph=True, allow_unused=True)[0]
+d_f__d_feat_torch_ = torch.autograd.grad(_f_torch, features, grad_out, retain_graph=True, create_graph=True, allow_unused=True)[0]
+d_f__d_grid_torch_ = torch.autograd.grad(_f_torch, grid, grad_out, retain_graph=True, create_graph=True, allow_unused=True)[0]
 
 d_f__d_feat_custom = torch.autograd.grad(f_custom, features, grad_out, retain_graph=True, create_graph=True, allow_unused=True)[0]
 d_f__d_grid_custom = torch.autograd.grad(f_custom, grid, grad_out, retain_graph=True, create_graph=True, allow_unused=True)[0]
 
 # print the differences
+print('first order')
 print((d_f__d_feat_torch - d_f__d_feat_custom).abs().max())
 print((d_f__d_grid_torch - d_f__d_grid_custom).abs().max())
+# print('first order')
+# print((d_f__d_feat_torch_ - d_f__d_feat_custom).abs().max())
+# print((d_f__d_grid_torch_ - d_f__d_grid_custom).abs().max())
+# print((d_f__d_feat_torch_ - d_f__d_feat_torch).abs().max())
+# print((d_f__d_grid_torch_ - d_f__d_grid_torch).abs().max())
 
 # second order gradients (only supporting 2nd order gradient from d_out/grids as of now)
 grad_d_f__d_grid = torch.randn_like(d_f__d_grid_custom)
@@ -91,3 +104,4 @@ d_f__d_grid____d_feat_custom = torch.autograd.grad(d_f__d_grid_custom, features,
 # print the differences
 print((d_f__d_grid____d_grad_out_torch - d_f__d_grid____d_grad_out_custom).abs().max())
 print((d_f__d_grid____d_feat_torch - d_f__d_grid____d_feat_custom).abs().max())
+print()
